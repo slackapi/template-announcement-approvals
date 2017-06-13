@@ -15,7 +15,7 @@ bot.getAuthorizedUser();
 
 slackEvents.on('message', (event) => {
   // Filter out messages from this bot itself or updates to messages
-  if (event.subtype === 'bot_message' || event.subtype === 'message_changed') {
+  if (event.subtype === 'bot_message' || event.subtype === 'message_changed' || event.subtype === 'message_deleted') {
     return;
   }
   bot.handleDirectMessage(event.user, event.channel, event.text);
