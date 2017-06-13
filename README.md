@@ -2,6 +2,8 @@
 
 This bot will send announcements into a channel of your choice (chosen during the install process). Users can DM `@announcebot` to get their announcements into a review queue. Once the approver (set to be the app installer) gives the thumbs up, the user will get a message that gives them the option to post the announcement at their leisure.
 
+![announcements_approvals](https://user-images.githubusercontent.com/700173/27061536-9446d3b6-4f99-11e7-8e55-d019764de7ca.gif)
+
 ## Set Up
 
 You should start by [creating a Slack app](https://api.slack.com/slack-apps) and configuring it
@@ -20,8 +22,17 @@ easiest way to do this is to
 [use a development proxy as described in the Events API module](https://github.com/slackapi/node-slack-events-api#configuration).
 
 The application listens for events at the path `/slack/events`. For example, the Request URL may
-look like `https://mymessagemenusample.ngrok.io/slack/events`.
+look like `https://myapprovals.ngrok.io/slack/events`.
 Add an event subscription to the `message.im` bot event. Save your changes.
+
+### Interactive messages
+
+Turn on Interactive Messages for the Slack app. You must input a Request URL, and the
+easiest way to do this is to
+[use a development proxy as described in the Events API module](https://github.com/slackapi/node-slack-events-api#configuration).
+
+The application listens for Interactive Message events at the path `/slack/actions`. For example, the Request URL may
+look like `https://myapprovals.ngrok.io/slack/actions`.
 
 ### Incoming webhook
 
