@@ -52,6 +52,12 @@ app.use(bodyParser.json());
 app.use('/slack/events', slackEvents.expressMiddleware());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/slack/actions', slackMessages.expressMiddleware());
+
+app.get('/', (req, res) => {
+  res.send('<h2>The Announcements Approval app is running</h2> <p>Follow the' +
+  ' instructions in the README to configure the Slack App and your environment variables.</p>');
+});
+
 // Start the server
 http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);
