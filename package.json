@@ -1,8 +1,8 @@
 {
-  "name": "@slack/sample-message-menus",
+  "name": "@slack/template-announcement-approvals",
   "version": "1.0.0",
   "private": true,
-  "description": "An example Slack app that demonstrates use of Message Menus",
+  "description": "An example Slack app",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

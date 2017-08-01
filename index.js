@@ -28,7 +28,7 @@ const slackMessages =
 // Action handling
 
 slackMessages.action('startAnnouncement', payload =>
-   bot.startAnnouncement(payload.user.id)
+   bot.startAnnouncement(payload.user.id, payload.trigger_id)
 );
 
 slackMessages.action(/confirmAnnouncement:(\w+)/, payload =>
