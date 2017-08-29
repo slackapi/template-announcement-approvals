@@ -31,15 +31,19 @@ slackMessages.action('startAnnouncement', payload =>
   bot.startAnnouncement(payload.user.id, payload.channel.id, payload.trigger_id)
 );
 
-slackMessages.action(/previewAnnouncement:(\w+)/, payload => {
+slackMessages.action(/previewAnnouncement:(\w+)/, (payload) => {
   const reg = /previewAnnouncement:(\w+)/;
-  const channel_id = (payload.callback_id).match(reg)[1];
-  bot.previewAnnouncement(payload.user.id, channel_id, payload.submission)
+  const channelId = (payload.callback_id).match(reg)[1];
+  bot.previewAnnouncement(payload.user.id, channelId, payload.submission);
 });
 
 slackMessages.action(/confirmAnnouncement:(\w+)/, payload =>
-  //bot.confirmAnnouncement(payload.user.id, payload.actions[0].value)
-  bot.confirmAnnouncement(payload.user.id, payload.actions[0].value, payload.channel.id, payload.trigger_id, payload.original_message.attachments[0])
+  // bot.confirmAnnouncement(payload.user.id, payload.actions[0].value)
+ bot.confirmAnnouncement(payload.user.id,
+                        payload.actions[0].value,
+                        payload.channel.id,
+                        payload.trigger_id,
+                        payload.original_message.attachments[0])
 );
 
 slackMessages.action(/processAnnouncement:(\w+)/, (payload) => {
