@@ -3,7 +3,7 @@
 This bot will send announcements into a channel of your choice (chosen during the install process). Users can DM `@announcebot` to get their announcements into a review queue. Once the approver (set to be the app installer) gives the thumbs up, the user will get a message that gives them the option to post the announcement at their leisure.
 
 This sample app uses the
-[Slack Event Adapter](https://github.com/slackapi/node-slack-events-api), and the [Slack ](https://github.com/slackapi/node-slack-interactive-messages) module for button and dialog fuctionalirt.
+[Slack Event Adapter](https://github.com/slackapi/node-slack-events-api), and the [Slack ](https://github.com/slackapi/node-slack-interactive-messages) module for button and dialog fuctionality.
 
 ![announcements_approvals](https://user-images.githubusercontent.com/915297/30937963-50e4176c-a38d-11e7-94ee-81fae196b506.gif)
 
