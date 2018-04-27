@@ -31,11 +31,10 @@ slackMessages.action('startAnnouncement', payload =>
   bot.startAnnouncement(payload.user.id, payload.channel.id, payload.trigger_id)
 );
 
-slackMessages.action(/previewAnnouncement:(\w+)/, (payload, respond) => {
+slackMessages.action(/previewAnnouncement:(\w+)/, (payload) => {
   const reg = /previewAnnouncement:(\w+)/;
   const channelId = (payload.callback_id).match(reg)[1];
   bot.previewAnnouncement(payload.user.id, channelId, payload.submission)
-  .then(respond)
   .catch(console.error);
 });
 
