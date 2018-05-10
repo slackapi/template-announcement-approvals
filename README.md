@@ -35,7 +35,7 @@ This sample app uses the
 #### Enable the Events API
 1. Go back to the app settings and click on Events Subscriptions
 1. Set the Request URL to your ngrok or Glitch URL + /slack/events
-1. On the same page, subscribe to the `message.im` event
+1. On the same page, subscribe to the `message.im` _Bot_ event
 
 #### Enable Interactive Messages
 
