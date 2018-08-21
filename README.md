@@ -6,7 +6,9 @@
 *Learn more about the workspace app at the [Slack API doc](https://api.slack.com/workspace-apps-preview).*
 
 
-This app will send announcements into a channel of your choice (chosen during the install process). Users can DM `@announcebot` to get their announcements into a review queue. Once the approver (set to be the app installer) gives the thumbs up, the user will get a message that gives them the option to post the announcement at their leisure.
+This app will send announcements into a channel of your choice. Users can DM this app to get their announcements into a review queue. Once the approver gives the thumbs up, the announcement will be posted to public.
+
+User A ("girlie_mac") wants to announce about donuts on `#random` channel, and User B ("Slack Boss") approves it:
 
 ![announcements_approvals](images/demo_approval_flow.gif)
 
@@ -14,7 +16,7 @@ This app will send announcements into a channel of your choice (chosen during th
 
 #### Create a Slack app
 
-1. Create a *workspace app* at [https://api.slack.com/apps?new_app_token=1]
+1. Create a *workspace app* at (https://api.slack.com/apps?new_app_token=1)[https://api.slack.com/apps?new_app_token=1]
 1. Navigate to the OAuth & Permissions page and add the following scopes:
     * `chat:write`
     * `conversations.app_home:create`
@@ -44,6 +46,6 @@ This app will send announcements into a channel of your choice (chosen during th
 1. Set the Request URL to your server or Glitch URL + `/interactions`
 
 
-## Sequence Diagram
+## The app sequence diagram
 
 ![dialog](images/diagram_approval_flow.png)
