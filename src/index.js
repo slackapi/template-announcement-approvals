@@ -102,7 +102,7 @@ app.post('/interactions', (req, res) => {
 
       // Admin approved. Post the announcement.
       else if (callback_id.match(/adminApprove:/)) {
-        let match = callback_id.match(/adminApprove:(.*)/)
+        let match = callback_id.match(/adminApprove:(.*)/) // Extract the approver's user id stored as a part of the callback_id!
         let requester = match[1]; 
 
         if(actions[0].value === 'approve') {
@@ -111,9 +111,7 @@ app.post('/interactions', (req, res) => {
           message.sendShortMessage(requester, 'The request was denied.');
           message.sendShortMessage(user.id, 'Thanks. I am letting the requester know!');
         }
-        
       }
-
     } 
     
     /* Dialog submission event */
