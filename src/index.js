@@ -65,7 +65,7 @@ app.post('/events', (req, res) => {
       }
       break;
     }
-    default: { res.sendStatus(500); }
+    default: { res.sendStatus(404); }
   }
 });
   

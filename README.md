@@ -5,6 +5,7 @@
 
 *Learn more about the workspace app at the [Slack API doc](https://api.slack.com/workspace-apps-preview).*
 
+---
 
 This app will send announcements into a channel of your choice. Users can DM this app to get their announcements into a review queue. Once the approver gives the thumbs up, the announcement will be posted to public.
 
@@ -23,7 +24,6 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
     * `conversations:read`
 1. Enable the events (See below *Enable the Events API*)
 1. Enable the interactive messages (See below *Enable Interactive Messages*)
-1. Click 'Save Changes' and install the app
 1. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
 
 #### Run locally or [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/slack-announcements-approval-blueprint)
@@ -37,12 +37,12 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
     * Start the app (`npm start`)
 
 #### Enable the Events API
-1. Go back to the app settings and click on **Events Subscriptions**
+1. Click on **Events Subscriptions** and enable events.
 1. Set the Request URL to your server (*e.g.* `https://yourname.ngrok.com`) or Glitch URL + `/events`
 1. On the same page, subscribe to the `message.app_home` events
 
 #### Enable Interactive Messages
-1. In the app settings, click on Interactive Components
+1. Click on **Interactive Components**.
 1. Set the Request URL to your server or Glitch URL + `/interactions`
 
 
