@@ -79,7 +79,7 @@ app.post('/interactions', (req, res) => {
     res.sendStatus(404); 
     return;
   } else {
-    const { type, user, trigger_id, callback_id, actions, submission } = JSON.parse(req.body.payload);
+    const { type, user, trigger_id, callback_id, actions, response_url, submission } = JSON.parse(req.body.payload);
 
     /* Button press event 
      * Check `callback_id` / `value` when handling multiple buttons in an app
