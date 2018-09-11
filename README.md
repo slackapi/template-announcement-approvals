@@ -17,7 +17,7 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
 
 #### Create a Slack app
 
-1. Create a *workspace app* at (https://api.slack.com/apps?new_app_token=1)[https://api.slack.com/apps?new_app_token=1]
+1. Create a *workspace app* at [https://api.slack.com/apps?new_app_token=1]
 1. Navigate to the OAuth & Permissions page and add the following scopes:
     * `chat:write`
     * `conversations.app_home:create`
