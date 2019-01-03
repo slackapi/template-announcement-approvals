@@ -61,6 +61,6 @@ Set Environment Variables and run:
 
 On Slack client, "invite" your bot to appropriate channels. The bot cannot post messages to the channels where the bot is not added.
 
-## The app sequence diagram
+## The app sequence diagram (Outdated. will be replaced with a new diagram soon!)
 
 ![dialog](images/diagram_approval_flow.png)
