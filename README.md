@@ -23,7 +23,7 @@ Clone the repo (then `npm install` to install the dependencies), or if you'd lik
 
 #### 2. Create a Slack app
 
-1. Create an app at (https://api.slack.com/apps)[https://api.slack.com/apps]
+1. Create an app at [api.slack.com/apps](https://api.slack.com/apps)
 1. Navigate to **Bot Users** and click "Add a Bot User" to create one.
 1. Navigate to the OAuth & Permissions page and add the following scopes:
     * `bot`
@@ -58,6 +58,8 @@ Set Environment Variables and run:
     * `SLACK_SIGNING_SECRET`: Your app's Signing Secret (available on the **Basic Information** page)
 1. If you're running the app locally:
     * Start the app (`npm start`)
+
+On Slack client, "invite" your bot to appropriate channels. The bot cannot post messages to the channels where the bot is not added.
 
 ## The app sequence diagram
 
