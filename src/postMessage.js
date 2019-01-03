@@ -17,13 +17,13 @@ const postInitMessage = (userId) => {
     attachments: JSON.stringify([
       {
         text: 'Do you have something to announce?',
-        callback_id: 'startAnnouncement',
+        callback_id: 'makeAnnouncement',
         actions: [
           {
             name: 'start',
             text: 'Make announcement',
             type: 'button',
-            value: 'startAnnouncement',
+            value: 'makeAnnouncement',
           }
         ]
       }
@@ -67,7 +67,7 @@ const postAnnouncementToChannel = (user, announcement) => {
       }
     ])
   };
-  send(announcementData);
+  send(announcementData, user);
 }
 
 const sendRequestToApprover = (userId, announcement) => {
@@ -81,7 +81,7 @@ const sendRequestToApprover = (userId, announcement) => {
       {
         title: title,
         text: details,
-        footer: `Will be posted on ${channel}` // a good idea to get the channel name from the id with `channels.info`
+        color: '#36a64f'
       },
       {
         text: `Would you like to post the announcement now?`,
@@ -115,15 +115,14 @@ const sendShortMessage = (userId, text) => {
   send(data);
 };
 
-const send = (data) => { 
-  axios.post(`${apiUrl}/chat.postMessage`, qs.stringify(data))
-  .then((result => {
-    console.log(result.data);
-  }))
-  .catch((err) => {
+const send = async(data) => { 
+  data.as_user = true; // send DM as a bot, not Slackbot
+  const result = await axios.post(`${apiUrl}/chat.postMessage`, qs.stringify(data))
+  try {
+    if(result.data.error) console.log(`PostMessage Error: ${result.data.error}`);
+  } catch(err) {
     console.log(err);
-  });
+  }
 };
-
 
 module.exports = { postInitMessage, requestApproval, postAnnouncement, sendShortMessage };

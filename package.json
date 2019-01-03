@@ -9,7 +9,6 @@
     "start": "node src/index.js"
   },
   "authors": [
-    "Helen Zeng <helen@hwz.io>",
     "Tomomi Imura <timura@slack-corp.com>"
   ],
   "license": "MIT",

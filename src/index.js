@@ -13,6 +13,7 @@ const app = express();
 
 const apiUrl = 'https://slack.com/api';
 const announcements = {};
+let bot = '';
 
 /*
  * Parse application/x-www-form-urlencoded && application/json
@@ -37,7 +38,7 @@ app.get('/', (req, res) => {
 
 /*
  * Endpoint to receive events from Slack's Events API.
- * It handles `message.app_home` event callbacks.
+ * It handles `message.im` event callbacks.
  */
 
 app.post('/events', (req, res) => {
@@ -53,11 +54,13 @@ app.post('/events', (req, res) => {
         res.sendStatus(404);
         return;
       } else {
-        const { type, channel_type, user, subtype } = req.body.event;
+        const { user, bot_id } = req.body.event;
 
-        // `message.app_home` is fired when a user sent a message to your app
-        if (channel_type === 'app_home' && subtype !== 'message_deleted') {
-          
+        if (bot_id) { 
+          bot = user;
+          console.log(`Bot User ID: ${bot}`);
+          return;
+        } else {
           // DM the user a confirmation message
           message.postInitMessage(user);
         }
@@ -73,7 +76,7 @@ app.post('/events', (req, res) => {
  * Endpoint to receive events from interactive message and a dialog on Slack. 
  * Verify the signing secret before continuing.
  */
-app.post('/interactions', (req, res) => {
+app.post('/interactions', async(req, res) => {
 
   if(!signature.isVerified(req)) {
     res.sendStatus(404); 
@@ -88,24 +91,27 @@ app.post('/interactions', (req, res) => {
     if(type === 'interactive_message') { 
 
       // Initial button interaction - Start creatng an announcement
-      if(callback_id === 'startAnnouncement') {
-        openDialog(trigger_id).then((result) => {
+      if(callback_id === 'makeAnnouncement') {
+        try {
+          const result = await openDialog(trigger_id);
           if(result.data.error) {
             res.sendStatus(500);
           } else {
             res.sendStatus('');
           }
-        }).catch((err) => {
+        } catch(err) {
           res.sendStatus(500);
-        });
+        }
       } 
 
       // Admin approved. Post the announcement.
       else if (callback_id.match(/adminApprove:/)) {
+        res.sendStatus(200);
+
         let match = callback_id.match(/adminApprove:(.*)/) // Extract the approver's user id stored as a part of the callback_id!
         let requester = match[1]; 
 
-        if(actions[0].value === 'approve') {
+        if(actions[0].value === 'approve') { console.log(announcements)
           message.postAnnouncement(requester, announcements[requester]);
         } else {
           message.sendShortMessage(requester, 'The request was denied.');
@@ -129,7 +135,7 @@ app.post('/interactions', (req, res) => {
 
 /*
  * Endpoint of loading an "external" select menu list for the dialog.
- * Use `apps.permissions.resources.list` method to grab all the authorized channlels 
+ * Use `users.conversations` method to grab all channlels where the bot is added.
  * that this app has the permission to post, and create a JSON list of the available channels.
  * 
  * The dynamically loading data wil look like:
@@ -137,40 +143,23 @@ app.post('/interactions', (req, res) => {
    options: [
       {
         label: 'channel name',
-        value: 'channell id'
+        value: 'channel id'
       }, ...
     ]
 
  */
-
-app.post('/channels', (req, res) => {
-  let cursor = null;
-
-  channels.findAuthedChannels(cursor).then((result) => {
-
-    let finalList = result.data.resources.filter((v) => { 
-      if (v.type === 'channel') {
-        return true
-      }
-      return false;
-      }).map((v) => { 
-
-      return channels.getChannelName(v.id).then((result2) => {
-        v.value = v.id;
-        v.label = `#${result2.data.channel.name}`;
-        return v; 
-      });
-    });
-
-    Promise.all(finalList).then((results) => {
-      res.send(JSON.stringify({options: results}));
-    });
-
+app.post('/channels', async(req, res) => {
+  const rawList = await channels.findAuthedChannels(bot);
+  
+  let finalList = rawList.map(o => {
+    return {value: o.id, label: `#${o.name}`};
   });
+  
+  res.send(JSON.stringify({options: finalList}));
 });
 
 // open the dialog by calling dialogs.open method and sending the payload
-const openDialog = (trigger_id) => {
+const openDialog = async(trigger_id) => {
 
   const dialogData = {
     token: process.env.SLACK_ACCESS_TOKEN,
@@ -207,8 +196,7 @@ const openDialog = (trigger_id) => {
   };
 
   // open the dialog by calling dialogs.open method and sending the payload
-  const promise = axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialogData));
-  return promise;
+  return axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialogData));
 };
 
   
