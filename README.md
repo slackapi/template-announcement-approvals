@@ -11,6 +11,16 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
 
 ![announcements_approvals](images/demo_approval_flow.gif)
 
+## API & Features
+
+This app uses:
+- Web API `
+    - `chat.postMessage` to post messages
+    - `users.conversations` to get which channels a user (in this case, bot, is on)
+- Events API `messages.im` to see when a DM message is sent
+- Interactive messages with buttons
+- Dialogs API with the dynamic menus
+
 ## Setup
 
 ### 1. Clone this repo, or Remix this Glitch repo
