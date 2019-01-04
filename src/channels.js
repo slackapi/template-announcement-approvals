@@ -10,13 +10,6 @@ const slackAuthToken = process.env.SLACK_ACCESS_TOKEN;
  *  Get a list of authorized resources
  */
 
-const getBotId = async() => {
-  const data = {
-    token: slackAuthToken
-  };
-  return axios.post(`${apiUrl}/bots.info`, qs.stringify(data));
-}
-
 const findAuthedChannels = async(id, cursor) => {
   const bot = id;
   
@@ -40,17 +33,4 @@ const findAuthedChannels = async(id, cursor) => {
   
 };
 
-/*
- *  Get a channel name from the id
- */
-
-const getChannelName = (channelId) => {
-  const data = {
-    token: slackAuthToken,
-    channel: channelId
-  };
-  const promise = axios.post(`${apiUrl}/conversations.info`, qs.stringify(data));
-  return promise;
-};
-
-module.exports = { findAuthedChannels, getChannelName };
+module.exports = { findAuthedChannels };

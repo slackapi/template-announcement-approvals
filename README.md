@@ -3,8 +3,6 @@
 
 > :sparkles: *Updated Jan 2019: All the changes from the previous version of this example, read the [diff.md](diff.md)*
 
-*Learn more about the workspace app at the [Slack API doc](https://api.slack.com/workspace-apps-preview).*
-
 ---
 
 This app will send announcements into a channel of your choice. Users can DM this app to get their announcements into a review queue. Once the approver gives the thumbs up, the announcement will be posted to public.
@@ -61,6 +59,6 @@ Set Environment Variables and run:
 
 On Slack client, "invite" your bot to appropriate channels. The bot cannot post messages to the channels where the bot is not added.
 
-## The app sequence diagram (Outdated. will be replaced with a new diagram soon!)
+## The app sequence diagram
 
 ![dialog](images/diagram_approval_flow.png)
