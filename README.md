@@ -5,7 +5,7 @@
 
 ---
 
-This app will send announcements into a channel of your choice. Users can DM this app to get their announcements into a review queue. Once the approver gives the thumbs up, the announcement will be posted to public.
+This app lets its bot to post an approved message into a public channel- A user DMs to bot to create an announcement, and once it is approved by another user, the message will be posted to public.
 
 User A ("girlie_mac") wants to announce about donuts on `#random` channel, and User B ("Slack Boss") approves it:
 
