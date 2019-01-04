@@ -26,7 +26,7 @@ const findAuthedChannels = async(id, cursor) => {
   const { channels, response_metadata } = result.data;
 
   if (response_metadata.next_cursor !== '') {
-    return channels.concat.findAuthedChannels(bot, response_metadata.next_cursor)
+    return channels.concat(await findAuthedChannels(id, response_metadata.next_cursor));
   } else {
     return channels;
   }
