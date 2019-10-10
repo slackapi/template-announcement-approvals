@@ -19,7 +19,7 @@ In the new version, you need to enable:
 
 ## OAuth Token
 
-Your OAuth access token should begins with `-xoxb`, instead of `-xoxp`.
+Your OAuth access token should begins with `xoxb-`, instead of `xoxp-`.
 
 
 ## Sigining Secret 

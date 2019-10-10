@@ -135,8 +135,8 @@ app.post('/interactions', async(req, res) => {
 
 /*
  * Endpoint of loading an "external" select menu list for the dialog.
- * Use `users.conversations` method to grab all channlels where the bot is added.
- * that this app has the permission to post, and create a JSON list of the available channels.
+ * Use `users.conversations` method to grab all channels where the bot is added
+ * and this app has the permission to post, creating a JSON list of the available channels.
  * 
  * The dynamically loading data wil look like:
  * 
