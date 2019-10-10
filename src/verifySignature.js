@@ -21,5 +21,7 @@ const isVerified = (req) => {
     // check that the request signature matches expected value
     return timingSafeCompare(hmac.digest('hex'), hash);
   }; 
+}
     
-  module.exports = { isVerified };
+module.exports = { isVerified };
+
