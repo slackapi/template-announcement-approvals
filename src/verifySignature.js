@@ -23,5 +23,5 @@ const isVerified = (req) => {
   }; 
 }
     
-module.exports = { isVerified }
+module.exports = { isVerified };
 
