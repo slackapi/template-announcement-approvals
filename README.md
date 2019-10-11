@@ -18,8 +18,8 @@ This app uses:
     - `chat.postMessage` to post messages
     - `users.conversations` to get which channels a user (in this case, bot, is on)
 - Events API `messages.im` to see when a DM message is sent
-- Interactive messages with buttons
-- Dialogs API with the dynamic menus
+- Block Kit messages with interactive buttons
+- Block Kit Modals API with dynamic menus
 
 ## Setup
 
@@ -32,31 +32,32 @@ Clone the repo (then `npm install` to install the dependencies), or if you'd lik
 #### 2. Create a Slack app
 
 1. Create an app at [api.slack.com/apps](https://api.slack.com/apps)
-1. Navigate to **Bot Users** and click "Add a Bot User" to create one.
-1. Navigate to the OAuth & Permissions page and add the following scopes:
+2. Navigate to **Bot Users** and click "Add a Bot User" to create one.
+3. Navigate to the OAuth & Permissions page and add the following scopes:
     * `bot`
-1. Enable the events (See below *Enable the Events API*)
-1. Enable the interactive messages (See below *Enable Interactive Messages*)
-1. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
+4. Enable the events (See below *Enable the Events API*)
+5. Enable the interactive messages (See below *Enable Interactive Messages*)
+6. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
 
 
 #### Enable the Events API
 1. Click on **Events Subscriptions** and enable events.
-1. Set the Request URL to your server (or Glitch URL) + `/events` (*e.g.* `https://your-server.com/events`)
-1. On the same page, go down to **Subscribe to Bot Events** section and subscribe to the `message.im` events
-1. Save
+2. Set the Request URL to your server (or Glitch URL) + `/events` (*e.g.* `https://your-server.com/events`)
+3. On the same page, go down to **Subscribe to Bot Events** section and subscribe to the `message.im` events
+4. Go down to **Subscribe to Workspace Events** section and subscribe to the `app_home_opened` events
+5. Save
 
 #### Enable Interactive Messages
 
 To enable interactive UI components (This example uses buttons):
 
 1. Click on **Interactive Components** and enable the interactivity.
-1. Set the Request URL to your server or Glitch URL + `/interactions`
+2. Set the Request URL to your server or Glitch URL + `/interactions`
 
 To dynamically populate a drop-down menu list in a dialog (This example uses a list of channels):
 
 1. Insert the Options Load URL (*e.g.* `https://your-server.com/channels`) in the **Message Menus** section
-1. Save
+2. Save
 
 #### 3. Run this App
 Set Environment Variables and run:
@@ -64,7 +65,7 @@ Set Environment Variables and run:
 1. Set the following environment variables in `.env` (copy from `.env.sample`):
     * `SLACK_ACCESS_TOKEN`: Your app's `xoxb-` token (available on the Install App page after the installation)
     * `SLACK_SIGNING_SECRET`: Your app's Signing Secret (available on the **Basic Information** page)
-1. If you're running the app locally:
+2. If you're running the app locally:
     * Start the app (`npm start`)
 
 On Slack client, "invite" your bot to appropriate channels. The bot cannot post messages to the channels where the bot is not added.

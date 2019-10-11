@@ -4,7 +4,6 @@ const axios = require('axios');
 const qs = require('qs');
 
 const apiUrl = 'https://slack.com/api';
-const slackAuthToken = process.env.SLACK_ACCESS_TOKEN;
 
 /*
  *  Get a list of authorized resources
@@ -13,15 +12,18 @@ const slackAuthToken = process.env.SLACK_ACCESS_TOKEN;
 const findAuthedChannels = async(id, cursor) => {
   const bot = id;
   
-  const args = {
-    token: slackAuthToken,
+  const data = {
     exclude_archived: true,
     user: bot
   };
 
-  if (cursor) args.cursor = cursor;
+  if (cursor) data.cursor = cursor;
 
-  const result = await axios.post(`${apiUrl}/users.conversations`, qs.stringify(args));
+  const result = await axios.post(`${apiUrl}/users.conversations`, data, {
+    headers: {
+      Authorization: 'Bearer ' + process.env.SLACK_ACCESS_TOKEN
+    }
+  });
 
   const { channels, response_metadata } = result.data;
 
@@ -30,7 +32,6 @@ const findAuthedChannels = async(id, cursor) => {
   } else {
     return channels;
   }
-  
 };
 
 module.exports = { findAuthedChannels };

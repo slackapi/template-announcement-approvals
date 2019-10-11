@@ -4,8 +4,7 @@ const util = require('util');
 const axios = require('axios');
 const express = require('express');
 const bodyParser = require('body-parser');
-const qs = require('querystring');
-const message = require('./postMessage');
+const api = require('./api');
 const signature = require('./verifySignature');
 const channels = require('./channels');
 
@@ -61,8 +60,7 @@ app.post('/events', (req, res) => {
           console.log(`Bot User ID: ${bot}`);
           return;
         } else {
-          // DM the user a confirmation message
-          message.postInitMessage(user);
+          handleEvent(req.body.event, user)
         }
         res.sendStatus(200);
       }
@@ -77,127 +75,170 @@ app.post('/events', (req, res) => {
  * Verify the signing secret before continuing.
  */
 app.post('/interactions', async(req, res) => {
-
   if(!signature.isVerified(req)) {
     res.sendStatus(404); 
     return;
   } else {
-    const { type, user, trigger_id, callback_id, actions, response_url, submission } = JSON.parse(req.body.payload);
+    const payload = JSON.parse(req.body.payload);
 
     /* Button press event 
      * Check `callback_id` / `value` when handling multiple buttons in an app
      */
 
-    if(type === 'interactive_message') { 
+    if(payload.type === 'block_actions') { 
 
-      // Initial button interaction - Start creatng an announcement
-      if(callback_id === 'makeAnnouncement') {
-        try {
-          const result = await openDialog(trigger_id);
-          if(result.data.error) {
-            res.sendStatus(500);
-          } else {
-            res.sendStatus('');
-          }
-        } catch(err) {
-          res.sendStatus(500);
-        }
-      } 
+      let action = payload.actions[0]
 
-      // Admin approved. Post the announcement.
-      else if (callback_id.match(/adminApprove:/)) {
-        res.sendStatus(200);
-
-        let match = callback_id.match(/adminApprove:(.*)/) // Extract the approver's user id stored as a part of the callback_id!
-        let requester = match[1]; 
-
-        if(actions[0].value === 'approve') { console.log(announcements)
-          message.postAnnouncement(requester, announcements[requester]);
-        } else {
-          message.sendShortMessage(requester, 'The request was denied.');
-          message.sendShortMessage(user.id, 'Thanks. I am letting the requester know!');
-        }
+      switch (action.action_id) {
+        case 'make_announcement': 
+          await api.openRequestModal(payload.trigger_id);
+          break;
+        case 'dismiss': 
+          await api.deleteMessage(payload.channel, payload.message);
+          break;
+        case 'approve': 
+          await api.deleteMessage(payload.channel, payload.message);
+          await api.sendShortMessage(payload.user.id, 'Thanks! This post has been announced.');
+          await api.postAnnouncement(JSON.parse(action.value));
+          break;  
+        case 'reject': 
+          await api.deleteMessage(payload.channel, payload.message);
+          let value = JSON.parse(action.value)
+          await api.sendShortMessage(value.requester, 'Sorry, your request has been denied.');
+          await api.sendShortMessage(payload.user.id, 'This request has been denied. I am letting the requester know!');
+          break;    
       }
-    } 
-    
-    /* Dialog submission event */
-    
-    else if(type === 'dialog_submission') {
-      // immediately respond with a empty 200 response to let Slack know the command was received
-      res.send('');
-
-      // Store it temporary until the announcement is posted
-      announcements[user.id] = submission;
-      message.requestApproval(user.id, submission);
+    } else if (payload.type === 'view_submission') {
+      return handleViewSubmission(payload, res);
     }
+
+      // acknowledge event
+    return res.sendStatus(200); 
   } 
 });
 
-/*
- * Endpoint of loading an "external" select menu list for the dialog.
- * Use `users.conversations` method to grab all channels where the bot is added
- * and this app has the permission to post, creating a JSON list of the available channels.
- * 
- * The dynamically loading data wil look like:
- * 
-   options: [
-      {
-        label: 'channel name',
-        value: 'channel id'
-      }, ...
-    ]
+const handleEvent = async (event, user) => {
+  switch(event.type) {
+    case 'app_home_opened': 
+      let history = await api.retrieveHistory(event.channel);
+      if(!history.messages.length) await api.postInitMessage(user);
+      break;
+    case 'message':
+      await api.postInitMessage(user);
+      break;
+  }
+}
 
- */
-app.post('/channels', async(req, res) => {
-  const rawList = await channels.findAuthedChannels(bot);
-  
-  let finalList = rawList.map(o => {
-    return {value: o.id, label: `#${o.name}`};
-  });
-  
-  res.send(JSON.stringify({options: finalList}));
-});
+const handleViewSubmission = async (payload, res) => {
+  switch(payload.view.callback_id) {
+    case 'request_announcement': 
+      const values = payload.view.state.values;
+        let channels = values.channel.channel_id.selected_channels.map(channel => {
+          return `<#${channel}>`
+        }).join(', ');
+
+        return res.send({
+          response_action: 'push',
+          view: {
+            callback_id: 'confirm_announcement',
+            type: 'modal',
+            title: {
+              type: 'plain_text',
+              text: 'Submit request'
+            },
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*TITLE*`
+                }
+              },
+              {
+                type: 'divider'
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: values.title.title_id.value
+                }
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*DETAILS*`
+                }
+              },
+              {
+                type: 'divider'
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: values.details.details_id.value
+                }
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*APPROVER*`
+                }
+              },
+              {
+                type: 'divider'
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `<@${values.approver.approver_id.selected_user}>`
+                }
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*CHANNELS*`
+                }
+              },
+              {
+                type: 'divider'
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: channels
+                }
+              }
+            ],
+            close: {
+              type: 'plain_text',
+              text: 'Back'
+            },
+            submit: {
+              type: 'plain_text',
+              text: 'Submit'
+            },
+            private_metadata: JSON.stringify(payload.view.state.values)
+          }
+        })
+    case 'confirm_announcement': 
+      let data = payload.view.private_metadata;
+      await api.requestApproval(payload.user, data);
+      // clear modal stack
+      return res.send({
+        response_action: 'clear'
+      })
+  }
+}
 
 // open the dialog by calling dialogs.open method and sending the payload
-const openDialog = async(trigger_id) => {
 
-  const dialogData = {
-    token: process.env.SLACK_ACCESS_TOKEN,
-    trigger_id: trigger_id,
-    dialog: JSON.stringify({
-      title: 'Request an announcement',
-      callback_id: 'request_announcement',
-      submit_label: 'Request',
-      elements: [
-        {
-          type: 'text',
-          name: 'title',
-          label: 'Title'
-        },
-        {
-          type: 'textarea',
-          name: 'details',
-          label: 'Details'
-        },
-        {
-          type: 'select',
-          name: 'approver',
-          label: 'Select an approver',
-          data_source: 'users'
-        },
-        {
-          type: 'select', 
-          name: 'channel',
-          label: 'Where to be posted?',
-          data_source: 'external'
-        }
-      ]
-    })
-  };
-
-  // open the dialog by calling dialogs.open method and sending the payload
-  return axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialogData));
-};
 
   
 const server = app.listen(process.env.PORT || 5000, () => {
