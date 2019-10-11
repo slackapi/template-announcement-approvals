@@ -121,6 +121,7 @@ const handleEvent = async (event, user) => {
   switch(event.type) {
     case 'app_home_opened': 
       let history = await api.retrieveHistory(event.channel);
+      // only send initial message for the first time users open app home
       if(!history.messages.length) await api.postInitMessage(user);
       break;
     case 'message':
