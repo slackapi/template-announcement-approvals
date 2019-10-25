@@ -10,7 +10,7 @@
     "dev": "nodemon src/index.js"
   },
   "authors": [
-    "Tomomi Imura <timura@slack-corp.com>"
+    "David Pichsenmeister & Tomomi Imura <opensource@slack.com>"
   ],
   "license": "MIT",
   "dependencies": {
