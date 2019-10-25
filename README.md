@@ -1,7 +1,7 @@
 # "AnnounceBot" Approval Workflows with Modal
 
 
-> :sparkles: *Updated October 2019: As we have introduced some new features, this tutorial and the code samples have been updated! All the changes from the previous version of this example, read the [DIFF.md](DIFF.md)*
+> :sparkles: *Updated October 2019: As we have introduced some new features, this tutorial and the code samples have been updated! All the changes from the previous version of this example, read the [DIFF.md](diff.md)*
 
 ---
 
