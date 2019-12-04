@@ -1,7 +1,7 @@
-# Approval Workflows with AnnounceBot
+# "AnnounceBot" Approval Workflows with Modal
 
 
-> :sparkles: *Updated Jan 2019: All the changes from the previous version of this example, read the [diff.md](diff.md)*
+> :sparkles: *Updated October 2019: As we have introduced some new features, this tutorial and the code samples have been updated! All the changes from the previous version of this example, read the [DIFF.md](diff.md)*
 
 ---
 
@@ -72,4 +72,5 @@ On Slack client, "invite" your bot to appropriate channels. The bot cannot post 
 
 ## The app sequence diagram
 
+*To be updated- `dialog.open` should be replaced with `views.open`*
 ![dialog](images/diagram_approval_flow.png)

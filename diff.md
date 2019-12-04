@@ -1,13 +1,27 @@
 # What's New? - Updates from the Previous Example
 
-## App design changes
+---
+## Changes made in October 2019
+
+### Modals
+
+*Major updates!: This requires to update your code!*
+
+We released [Modals](https://api.slack.com/block-kit/surfaces/modals), which is replacing the existing Dialogs, with more powerful features.
+
+Now, instead of calling an API to open a dialog is replaced with the new view API to open a modal with Block Kit in the code sample.
+
+---
+## Changes made in January 2019
+
+### App design changes
 
 * The overall user flow is simplifed. 
 * This app sample is now more consistent with other Blueprints examples- *e.g.* file names, using the same frameworks such as Express.js.
 * Sticking with the Web APIs- instead of using a webhook, the app sends messages via `chat.postMessage` method.
 * UX Change: A user can pick an approver and the channel where an announcement to be posted. This change gives you more use cases with Dialogs API's dynamic menu!
 
-## OAuth Scopes
+### OAuth Scopes
 
 Some scopes are no longer valid with workspace apps.
 
@@ -17,12 +31,12 @@ In previous example, these scopes were required:
 In the new version, you need to enable:
 * `bot` 
 
-## OAuth Token
+### OAuth Token
 
 Your OAuth access token should begins with `xoxb-`, instead of `xoxp-`.
 
 
-## Sigining Secret 
+### Sigining Secret 
 
 *This requires to update your code!*
 
