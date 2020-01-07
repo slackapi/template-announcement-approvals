@@ -1,6 +1,17 @@
 # What's New? - Updates from the Previous Example
 
 ---
+## Changes made in January 2020
+
+### Modals
+
+*Major updates!: This requires to update your scopes in App Management!*
+
+We have intruduced more granular OAuth permissions for the apps that uses a bot token. Now, this sample app requires the scopes, `chat:write`, `im:write`, `im:history`, and `channels:read`, where it used to require only `bot` scope.
+
+To learn more about the change, please refer [Migration guide for classic Slack apps](https://api.slack.com/authentication/migration).
+
+---
 ## Changes made in October 2019
 
 ### Modals
