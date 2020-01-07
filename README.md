@@ -16,8 +16,11 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
 This app uses:
 - Web API `
     - `chat.postMessage` to post messages
-    - `users.conversations` to get which channels a user (in this case, bot, is on)
-- Events API `messages.im` to see when a DM message is sent
+    - `im.open` to send direct messages from the bot to a user
+    - `users.conversations` to get channels the bot user is a member of
+    - `views.publish` to publish a view to the Home tab
+    - `views.open` to open a Block Kit modal and collect information for the announcement to be sent
+- Events API `message.im` to see when a DM message is sent
 - Block Kit messages with interactive buttons
 - Block Kit Modals API with dynamic menus
 
@@ -34,30 +37,40 @@ Clone the repo (then `npm install` to install the dependencies), or if you'd lik
 1. Create an app at [api.slack.com/apps](https://api.slack.com/apps)
 2. Navigate to **Bot Users** and click "Add a Bot User" to create one.
 3. Navigate to the OAuth & Permissions page and add the following scopes:
-    * `bot`
+    * `chat:write`
+    * `im:write`
+    * `im:history`
+    * `channels:read`
 4. Enable the events (See below *Enable the Events API*)
 5. Enable the interactive messages (See below *Enable Interactive Messages*)
-6. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
-
+6. Enable App Home (See below *App Home*)
+7. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
 
 #### Enable the Events API
 1. Click on **Events Subscriptions** and enable events.
 2. Set the Request URL to your server (or Glitch URL) + `/events` (*e.g.* `https://your-server.com/events`)
-3. On the same page, go down to **Subscribe to Bot Events** section and subscribe to the `message.im` events
-4. Go down to **Subscribe to Workspace Events** section and subscribe to the `app_home_opened` events
-5. Save
+3. On the same page, go down to **Subscribe to Bot Events** section and subscribe to these events 
+    - `message.im` 
+    - `app_home_opened`
+4. Save
 
 #### Enable Interactive Messages
 
 To enable interactive UI components (This example uses buttons):
 
 1. Click on **Interactive Components** and enable the interactivity.
-2. Set the Request URL to your server or Glitch URL + `/interactions`
+2. Set the Request URL to your server (or Glitch URL) + `/interactions`
 
 To dynamically populate a drop-down menu list in a dialog (This example uses a list of channels):
 
-1. Insert the Options Load URL (*e.g.* `https://your-server.com/channels`) in the **Message Menus** section
+1. Insert the Options Load URL (*e.g.* `https://your-server.com/options`) in the **Message Menus** section
 2. Save
+
+#### Enable App Home
+
+To enable App Home:
+
+1. Click on **App Home** and make sure both `Home Tab` and `Messages Tab` are enabled.
 
 #### 3. Run this App
 Set Environment Variables and run:

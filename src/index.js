@@ -1,18 +1,12 @@
 require('dotenv').config();
 
-const util = require('util');
-const axios = require('axios');
 const express = require('express');
 const bodyParser = require('body-parser');
 const api = require('./api');
+const payloads = require('./payloads');
 const signature = require('./verifySignature');
-const channels = require('./channels');
 
 const app = express();
-
-const apiUrl = 'https://slack.com/api';
-const announcements = {};
-let bot = '';
 
 /*
  * Parse application/x-www-form-urlencoded && application/json
@@ -26,13 +20,13 @@ const rawBodyBuffer = (req, res, buf, encoding) => {
   }
 };
 
-app.use(bodyParser.urlencoded({verify: rawBodyBuffer, extended: true }));
+app.use(bodyParser.urlencoded({ verify: rawBodyBuffer, extended: true }));
 app.use(bodyParser.json({ verify: rawBodyBuffer }));
 
 app.get('/', (req, res) => {
   res.send('<h2>The Approval Flow app is running</h2> <p>Follow the' +
-  ' instructions in the README to configure the Slack App and your' +
-  ' environment variables.</p>');
+    ' instructions in the README to configure the Slack App and your' +
+    ' environment variables.</p>');
 });
 
 /*
@@ -44,204 +38,162 @@ app.post('/events', (req, res) => {
   switch (req.body.type) {
     case 'url_verification': {
       // verify Events API endpoint by returning challenge if present
-      res.send({ challenge: req.body.challenge });
-      break;
+      return res.send({ challenge: req.body.challenge });
     }
     case 'event_callback': {
       // Verify the signing secret
-      if (!signature.isVerified(req)) {
-        res.sendStatus(404);
-        return;
-      } else {
-        const { user, bot_id } = req.body.event;
+      if (!signature.isVerified(req)) return res.status(400).send();
 
-        if (bot_id) { 
-          bot = user;
-          console.log(`Bot User ID: ${bot}`);
-          return;
-        } else {
-          handleEvent(req.body.event, user)
-        }
-        res.sendStatus(200);
-      }
-      break;
+      const event = req.body.event;
+      // ignore events from bots
+      if (event.bot_id) return res.status(200).send();
+
+      handleEvent(event);
+      return res.status(200).send();
     }
-    default: { res.sendStatus(404); }
+    default:
+      return res.status(404).send();
   }
 });
-  
+
 /*
  * Endpoint to receive events from interactive message and a dialog on Slack. 
  * Verify the signing secret before continuing.
  */
-app.post('/interactions', async(req, res) => {
-  if(!signature.isVerified(req)) {
-    res.sendStatus(404); 
-    return;
-  } else {
-    const payload = JSON.parse(req.body.payload);
+app.post('/interactions', async (req, res) => {
+  if (!signature.isVerified(req)) return res.status(400).send();
 
-    /* Button press event 
-     * Check `callback_id` / `value` when handling multiple buttons in an app
-     */
+  const payload = JSON.parse(req.body.payload);
 
-    if(payload.type === 'block_actions') { 
+  if (payload.type === 'block_actions') {
+    // acknowledge the event before doing heavy-lifting on our servers
+    res.status(200).send();
 
-      let action = payload.actions[0]
+    let action = payload.actions[0]
 
-      switch (action.action_id) {
-        case 'make_announcement': 
-          await api.openRequestModal(payload.trigger_id);
-          break;
-        case 'dismiss': 
-          await api.deleteMessage(payload.channel, payload.message);
-          break;
-        case 'approve': 
-          await api.deleteMessage(payload.channel, payload.message);
-          await api.sendShortMessage(payload.user.id, 'Thanks! This post has been announced.');
-          await api.postAnnouncement(JSON.parse(action.value));
-          break;  
-        case 'reject': 
-          await api.deleteMessage(payload.channel, payload.message);
-          let value = JSON.parse(action.value)
-          await api.sendShortMessage(value.requester, 'Sorry, your request has been denied.');
-          await api.sendShortMessage(payload.user.id, 'This request has been denied. I am letting the requester know!');
-          break;    
-      }
-    } else if (payload.type === 'view_submission') {
-      return handleViewSubmission(payload, res);
+    switch (action.action_id) {
+      case 'make_announcement':
+        // await api.openRequestModal(payload.trigger_id);
+        await api.callAPIMethodPost('views.open', {
+          trigger_id: payload.trigger_id,
+          view: payloads.request_announcement()
+        });
+        break;
+      case 'dismiss':
+        await api.callAPIMethodPost('chat.delete', {
+          channel: payload.channel.id,
+          ts: payload.message.ts
+        });
+        break;
+      case 'approve':
+        await api.postAnnouncement(payload, JSON.parse(action.value));
+        break;
+      case 'reject':
+        await api.rejectAnnouncement(payload, JSON.parse(action.value));
+        break;
     }
+  } else if (payload.type === 'view_submission') {
+    return handleViewSubmission(payload, res);
+  }
 
-      // acknowledge event
-    return res.sendStatus(200); 
-  } 
+  return res.status(404).send();
+
 });
 
-const handleEvent = async (event, user) => {
-  switch(event.type) {
-    case 'app_home_opened': 
-      let history = await api.retrieveHistory(event.channel);
-      // only send initial message for the first time users open app home
-      if(!history.messages.length) await api.postInitMessage(user);
+/*
+ * Endpoint to receive events from interactive message and a dialog on Slack.
+ * Verify the signing secret before continuing.
+ */
+app.post('/options', async (req, res) => {
+  if (!signature.isVerified(req)) return res.status(400).send();
+  const payload = JSON.parse(req.body.payload);
+
+  let botUser = await api.callAPIMethodPost('auth.test', {})
+  let conversations = await api.getChannels(botUser.user_id)
+  let options = conversations.map(c => {
+    return {
+      text: {
+        type: 'plain_text',
+        text: c.name
+      },
+      value: c.id
+    }
+  })
+
+  options = options.filter(option => {
+    return option.text.text.indexOf(payload.value) >= 0
+  })
+
+  return res.send({
+    options: options
+  })
+})
+
+
+/**
+ * Handle all incoming events from the Events API
+ */
+const handleEvent = async (event) => {
+  switch (event.type) {
+    case 'app_home_opened':
+      if (event.tab === 'messages') {
+        // only send initial message for the first time users opens the messages tab,
+        // we can check for that by requesting the message history
+        let history = await api.callAPIMethodGet('im.history', {
+          channel: event.channel,
+          count: 1
+        })
+
+        if (!history.messages.length) await api.callAPIMethodPost('chat.postMessage', payloads.welcome_message({
+          channel: event.channel
+        }));
+      } else if (event.tab === 'home') {
+        await api.callAPIMethodPost('views.publish', {
+          user_id: event.user,
+          view: payloads.welcome_home()
+        });
+      }
       break;
     case 'message':
-      await api.postInitMessage(user);
+      // only respond to new messages posted by user, those won't carry a subtype
+      if (!event.subtype) {
+        await api.callAPIMethodPost('chat.postMessage', payloads.welcome_message({
+          channel: event.channel
+        }));
+      }
       break;
   }
 }
 
+/**
+ * Handle all Block Kit Modal submissions
+ */
 const handleViewSubmission = async (payload, res) => {
-  switch(payload.view.callback_id) {
-    case 'request_announcement': 
+  switch (payload.view.callback_id) {
+    case 'request_announcement':
       const values = payload.view.state.values;
-        let channels = values.channel.channel_id.selected_channels.map(channel => {
-          return `<#${channel}>`
-        }).join(', ');
+      let channels = values.channel.channel_id.selected_options.map(channel => channel.value);
+      let channelString = channels.map(channel => `<#${channel}>`).join(', ');
 
-        return res.send({
-          response_action: 'push',
-          view: {
-            callback_id: 'confirm_announcement',
-            type: 'modal',
-            title: {
-              type: 'plain_text',
-              text: 'Submit request'
-            },
-            blocks: [
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `*TITLE*`
-                }
-              },
-              {
-                type: 'divider'
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: values.title.title_id.value
-                }
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `*DETAILS*`
-                }
-              },
-              {
-                type: 'divider'
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: values.details.details_id.value
-                }
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `*APPROVER*`
-                }
-              },
-              {
-                type: 'divider'
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `<@${values.approver.approver_id.selected_user}>`
-                }
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `*CHANNELS*`
-                }
-              },
-              {
-                type: 'divider'
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: channels
-                }
-              }
-            ],
-            close: {
-              type: 'plain_text',
-              text: 'Back'
-            },
-            submit: {
-              type: 'plain_text',
-              text: 'Submit'
-            },
-            private_metadata: JSON.stringify(payload.view.state.values)
-          }
-        })
-    case 'confirm_announcement': 
-      let data = payload.view.private_metadata;
-      await api.requestApproval(payload.user, data);
-      // clear modal stack
-      return res.send({
-        response_action: 'clear'
-      })
+      // respond with a stacked modal to the user to confirm selection
+      let announcement = {
+        title: values.title.title_id.value,
+        details: values.details.details_id.value,
+        approver: values.approver.approver_id.selected_user,
+        channels: channels,
+        channelString: channelString
+      }
+      return res.send(payloads.confirm_announcement({
+        announcement
+      }));
+    case 'confirm_announcement':
+      await api.requestAnnouncement(payload.user, JSON.parse(payload.view.private_metadata));
+      // show a final confirmation modal that the request has been sent
+      return res.send(payloads.finish_announcement());
   }
 }
 
-// open the dialog by calling dialogs.open method and sending the payload
 
-
-  
 const server = app.listen(process.env.PORT || 5000, () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
 });
