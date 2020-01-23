@@ -14,7 +14,7 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
 ## API & Features
 
 This app uses:
-- Web API `
+- Web API
     - `chat.postMessage` to post messages
     - `im.open` to send direct messages from the bot to a user
     - `users.conversations` to get channels the bot user is a member of
@@ -35,16 +35,15 @@ Clone the repo (then `npm install` to install the dependencies), or if you'd lik
 #### 2. Create a Slack app
 
 1. Create an app at [api.slack.com/apps](https://api.slack.com/apps)
-2. Navigate to **Bot Users** and click "Add a Bot User" to create one.
-3. Navigate to the OAuth & Permissions page and add the following scopes:
+2. Navigate to the OAuth & Permissions page and add the following Bot token scopes:
     * `chat:write`
     * `im:write`
     * `im:history`
     * `channels:read`
-4. Enable the events (See below *Enable the Events API*)
-5. Enable the interactive messages (See below *Enable Interactive Messages*)
-6. Enable App Home (See below *App Home*)
-7. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
+3. Enable the events (See below *Enable the Events API*)
+4. Enable the interactive messages (See below *Enable Interactive Messages*)
+5. Enable App Home (See below *App Home*)
+6. Click 'Save Changes' and install the app (You should get an OAuth access token after the installation
 
 #### Enable the Events API
 1. Click on **Events Subscriptions** and enable events.
