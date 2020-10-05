@@ -42,8 +42,8 @@ const getChannels = async (userId, channels, cursor) => {
 
 const requestAnnouncement = async (user, submission) => {
   // Send the approver a direct message with "Approve" and "Reject" buttons 
-  let res = await callAPIMethodPost('im.open', {
-    user: submission.approver
+  let res = await callAPIMethodPost('conversations.open', {
+    users: submission.approver
   })
   submission.requester = user.id;
   submission.channel = res.channel.id;
@@ -60,8 +60,8 @@ const rejectAnnouncement = async (payload, announcement) => {
   });
 
   // 2. send a notification to the requester
-  let res = await callAPIMethodPost('im.open', {
-    user: announcement.requester
+  let res = await callAPIMethodPost('conversations.open', {
+    users: announcement.requester
   })
   await callAPIMethodPost('chat.postMessage', payloads.rejected({
     channel: res.channel.id,
@@ -100,50 +100,3 @@ module.exports = {
   postAnnouncement,
   requestAnnouncement
 }
-
-// const postAnnouncement = (announcement) => {
-//   const { title, details, channel, requester } = announcement;
-
-//   channel.channel_id.selected_channels.forEach(id => {
-//     postAnnouncementToChannels(title.title_id.value, details.details_id.value, id, requester);
-//   })
-
-//   sendShortMessage(requester, ':tada: Your announcement has been approved and posted!');
-// };
-
-// const postAnnouncementToChannels = (title, details, channel, requester) => {
-//   let announcementData = {
-//     token: process.env.SLACK_ACCESS_TOKEN,
-//     channel: channel,
-//     text: `:loudspeaker: Announcement from: <@${requester}>`,
-//     blocks: [
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text: title
-//         }
-//       },
-//       {
-//         type: 'divider'
-//       },
-//       {
-//         type: 'section',
-//         text: {
-//           type: 'mrkdwn',
-//           text: details
-//         }
-//       },
-//       {
-//         type: 'context',
-//         elements: [
-//           {
-//             type: 'mrkdwn',
-//             text: `Posted by <@${requester}>`
-//           }
-//         ]
-//       }
-//     ]
-//   };
-//   send(announcementData, false);
-// }

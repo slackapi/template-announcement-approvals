@@ -1,7 +1,7 @@
 # "AnnounceBot" Approval Workflows with Modal
 
 
-> :sparkles: *Updated January 2020: As we have introduced some new features, this tutorial and the code samples have been updated! All the changes from the previous version of this example, read the [DIFF.md](diff.md)*
+> :sparkles: *Updated October 2020: As we have introduced some new features, this tutorial and the code samples have been updated! All the changes from the previous version of this example, read the [DIFF.md](diff.md)*
 
 ---
 
@@ -16,10 +16,11 @@ User A ("girlie_mac") wants to announce about donuts on `#random` channel, and U
 This app uses:
 - Web API
     - `chat.postMessage` to post messages
-    - `im.open` to send direct messages from the bot to a user
+    - `conversations.open` to send direct messages from the bot to a user
     - `users.conversations` to get channels the bot user is a member of
     - `views.publish` to publish a view to the Home tab
     - `views.open` to open a Block Kit modal and collect information for the announcement to be sent
+    - `conversations.history` to view historical messages between the bot and user
 - Events API `message.im` to see when a DM message is sent
 - Block Kit messages with interactive buttons
 - Block Kit Modals API with dynamic menus
@@ -36,10 +37,10 @@ Clone the repo (then `npm install` to install the dependencies), or if you'd lik
 
 1. Create an app at [api.slack.com/apps](https://api.slack.com/apps)
 2. Navigate to the OAuth & Permissions page and add the following Bot token scopes:
+    * `channels:read`
     * `chat:write`
     * `im:write`
     * `im:history`
-    * `channels:read`
 3. Enable the events (See below *Enable the Events API*)
 4. Enable the interactive messages (See below *Enable Interactive Messages*)
 5. Enable App Home (See below *App Home*)

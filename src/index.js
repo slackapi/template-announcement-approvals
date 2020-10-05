@@ -139,11 +139,11 @@ const handleEvent = async (event) => {
       if (event.tab === 'messages') {
         // only send initial message for the first time users opens the messages tab,
         // we can check for that by requesting the message history
-        let history = await api.callAPIMethodGet('im.history', {
+        let history = await api.callAPIMethodGet('conversations.history', {
           channel: event.channel,
-          count: 1
+          limit: 1
         })
-
+        
         if (!history.messages.length) await api.callAPIMethodPost('chat.postMessage', payloads.welcome_message({
           channel: event.channel
         }));
