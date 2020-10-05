@@ -143,7 +143,7 @@ const handleEvent = async (event) => {
           channel: event.channel,
           limit: 1
         })
-        
+
         if (!history.messages.length) await api.callAPIMethodPost('chat.postMessage', payloads.welcome_message({
           channel: event.channel
         }));
