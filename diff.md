@@ -1,6 +1,17 @@
 # What's New? - Updates from the Previous Example
 
 ---
+## Changes made in October 2020
+
+### Chat API
+
+*Major updates!: This requires to update your code!*
+
+You will notice deprecation messages relating to the `im.open` and `im.history` Web API methods. Now, you can use the conversations api to communicate with members on Slack.  
+
+To learn more about the change, please refer to the [Slack Conversations API](https://api.slack.com/docs/conversations-api).
+
+---
 ## Changes made in January 2020
 
 ### Modals
